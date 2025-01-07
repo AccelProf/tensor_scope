@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-typedef void (*tensor_callback_t)(void* ptr, int64_t alloc_size, int64_t total_allocated,
+typedef void (*tensor_callback_t)(uint64_t ptr, int64_t alloc_size, int64_t total_allocated,
                                          int64_t total_reserved);
 
 extern "C" void register_tensor_scope(tensor_callback_t tensor_malloc_callback_ptr,
