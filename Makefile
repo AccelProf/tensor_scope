@@ -3,13 +3,13 @@ CONFIGS := Makefile.config
 
 include $(CONFIGS)
 
-OBJ_DIR := obj/
-SRC_DIR := src/
-INC_DIR := include/
-LIB_DIR := lib/
+OBJ_DIR := obj
+SRC_DIR := src
+INC_DIR := include
+LIB_DIR := lib
 PREFIX := tensor_scope
 
-LIB := $(LIB_DIR)lib$(PROJECT).so
+LIB := $(LIB_DIR)/lib$(PROJECT).so
 CUR_DIR := $(shell pwd)
 
 CXX ?=
@@ -23,8 +23,8 @@ else
 	CFLAGS += -O3
 endif
 
-SRCS := $(notdir $(wildcard $(SRC_DIR)*.cpp $(SRC_DIR)*/*.cpp))
-OBJS := $(addprefix $(OBJ_DIR), $(patsubst %.cpp, %.o, $(SRCS)))
+SRCS := $(notdir $(wildcard $(SRC_DIR)/*.cpp $(SRC_DIR)/*/*.cpp))
+OBJS := $(addprefix $(OBJ_DIR)/, $(patsubst %.cpp, %.o, $(SRCS)))
 
 TORCH_DIR = $(shell python3 -c "import torch; import os; print(os.path.dirname(torch.__file__))")
 PYTHON_INCLUDE_DIR = $(shell python3 -c "import sysconfig; print(sysconfig.get_path('include'))")
@@ -35,9 +35,9 @@ LDFLAGS += -L$(TORCH_DIR)/lib -Wl,-rpath=$(TORCH_DIR)/lib -L$(PYTHON_LIB_DIR)/..
 LIBS := -lc10 -ltorch -ltorch_cpu -lpython$(PYTHON_VERSION)
 
 
-all: dirs lib
+all: dirs libs
 dirs: $(OBJ_DIR) $(LIB_DIR)
-lib: $(LIB)
+libs: $(LIB)
 
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
@@ -48,11 +48,11 @@ $(LIB_DIR):
 $(LIB): $(OBJS)
 	$(CXX) $(LDFLAGS) -fPIC -shared -o $@ $^ $(LIBS)
 
-$(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
-	$(CXX) -I$(INC_DIR) $(INCLUDES) $(CFLAGS) -fPIC -c $< -o $@
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CXX) $(CFLAGS) -I$(INC_DIR) $(INCLUDES) -fPIC -c $< -o $@
 
-$(OBJ_DIR)%.o: $(SRC_DIR)/*/%.cpp
-	$(CXX) -I$(INC_DIR) $(INCLUDES) $(CFLAGS) -fPIC -c $< -o $@
+$(OBJ_DIR)/%.o: $(SRC_DIR)/*/%.cpp
+	$(CXX) $(CFLAGS) -I$(INC_DIR) $(INCLUDES) -fPIC -c $< -o $@
 
 .PHONY: clean
 clean:
