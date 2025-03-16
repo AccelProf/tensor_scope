@@ -1,11 +1,11 @@
-PROJECT := tensor_scope
+PROJECT := torch_scope
 
 
 OBJ_DIR := obj
 SRC_DIR := src
 INC_DIR := include
 LIB_DIR := lib
-PREFIX := tensor_scope
+PREFIX := torch_scope
 
 LIB := $(LIB_DIR)/lib$(PROJECT).so
 CUR_DIR := $(shell pwd)
