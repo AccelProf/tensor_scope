@@ -17,7 +17,7 @@ public:
 
     static std::unique_ptr<at::ObserverContext> operator_start_callback(const at::RecordFunction& fn);
 
-    static std::unique_ptr<at::ObserverContext> operator_end_callback(const at::RecordFunction& fn);
+    static void operator_end_callback(const at::RecordFunction& fn, at::ObserverContext* ctx);
 
 private:
     TorchOperator() {}
