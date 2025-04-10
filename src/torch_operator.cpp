@@ -8,7 +8,7 @@ TorchOperator& TorchOperator::getInstance() {
 void TorchOperator::enable_torch_callback() {
     auto callback = at::RecordFunctionCallback(
             &TorchOperator::operator_start_callback,
-            nullptr // &TorchOperator::operator_end_callback
+            &TorchOperator::operator_end_callback
         ).scopes({at::RecordScope::FUNCTION});
     operator_callback_handle_ = at::addGlobalCallback(callback);
 }
@@ -30,6 +30,9 @@ std::unique_ptr<at::ObserverContext> TorchOperator::operator_start_callback(cons
     return nullptr;
 }
 
-std::unique_ptr<at::ObserverContext> TorchOperator::operator_end_callback(const at::RecordFunction& fn) {
-    return nullptr;
+void TorchOperator::operator_end_callback(const at::RecordFunction& fn, at::ObserverContext* ctx) {
+    if (getInstance().operator_end_callback_ptr == nullptr) {
+        printf("operator_end_callback_ptr is nullptr\n");
+    }
+    getInstance().operator_end_callback_ptr(fn.name());
 }
