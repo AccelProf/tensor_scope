@@ -18,7 +18,7 @@ typedef void (*tensor_callback_t)(uint64_t ptr, int64_t alloc_size,
                         int64_t total_allocated, int64_t total_reserved);
 
 // TORCH_SCOPE_OPERATOR_START, TORCH_SCOPE_OPERATOR_END
-typedef void (*operator_callback_t)(std::string op_name);
+typedef void (*operator_callback_t)(void* ctx, std::string op_name);
 
 
 typedef void* torch_scope_callback_t;
