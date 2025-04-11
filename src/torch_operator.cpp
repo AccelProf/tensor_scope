@@ -1,5 +1,9 @@
 #include "torch_operator.h"
 
+struct OperatorCallbackContext : at::ObserverContext {
+    std::string op_name;
+};
+
 TorchOperator& TorchOperator::getInstance() {
     static TorchOperator instance;
     return instance;
@@ -26,13 +30,16 @@ std::unique_ptr<at::ObserverContext> TorchOperator::operator_start_callback(cons
     if (getInstance().operator_start_callback_ptr == nullptr) {
         printf("operator_start_callback_ptr is nullptr\n");
     }
-    getInstance().operator_start_callback_ptr(fn.name());
-    return nullptr;
+    auto op_ctx = std::make_unique<OperatorCallbackContext>();
+    op_ctx->op_name = fn.name();
+    getInstance().operator_start_callback_ptr(static_cast<void*>(op_ctx.get()), op_ctx->op_name);
+    return op_ctx;
 }
 
 void TorchOperator::operator_end_callback(const at::RecordFunction& fn, at::ObserverContext* ctx) {
     if (getInstance().operator_end_callback_ptr == nullptr) {
         printf("operator_end_callback_ptr is nullptr\n");
     }
-    getInstance().operator_end_callback_ptr(fn.name());
+    auto op_ctx = static_cast<OperatorCallbackContext*>(ctx);
+    getInstance().operator_end_callback_ptr((void*)op_ctx, op_ctx->op_name);
 }
