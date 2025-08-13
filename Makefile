@@ -37,8 +37,12 @@ CXX_FLAGS += -std=c++17 -fPIC
 ifeq ($(DEBUG), 1)
   CXX_FLAGS += -g -O0
 else
-  CXX_FLAGS += -O3
+  CXX_FLAGS += -O2
 endif
+
+# for multi-process support
+CXX_FLAGS += -fno-omit-frame-pointer
+LDFLAGS += -Wl,-z,nodelete
 
 # Needed by pinning + atfork paths
 LINK_LIBS += -ldl -pthread
