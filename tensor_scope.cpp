@@ -5,6 +5,8 @@
 
 #include <torch/extension.h>
 
+#include "sanalyzer.h"
+
 #define VERBOSE 1
 
 #ifdef VERBOSE
@@ -26,6 +28,7 @@ static inline void tensor_malloc_callback(uint64_t ptr,
                               int device_id) {
   PRINT("Malloc tensor %lu with size %ld, allocated %ld, reserved %ld on device %d\n",
         ptr, bytes, total_alloc, total_resv, device_id);
+  yosemite_tensor_malloc_callback(ptr, bytes, total_alloc, total_resv, device_id);
 }
 
 static inline void tensor_free_callback(uint64_t ptr,
@@ -35,6 +38,7 @@ static inline void tensor_free_callback(uint64_t ptr,
                             int device_id) {
   PRINT("Free tensor %lu with size %ld, allocated %ld, reserved %ld on device %d\n",
         ptr, bytes, total_alloc, total_resv, device_id);
+  yosemite_tensor_free_callback(ptr, bytes, total_alloc, total_resv, device_id);
 }
 
 // ----------- Profiler callback -----------
@@ -102,6 +106,12 @@ static std::shared_ptr<c10::DebugInfoBase> make_profiler_never_delete() {
   return pinned;
 }
 
+
+void cleanup(void) {
+    yosemite_terminate();
+}
+
+
 // Install once per process. Idempotent for safety.
 __attribute__((constructor))
 static void tensor_scope_on_load() {
@@ -112,5 +122,9 @@ static void tensor_scope_on_load() {
   g_prof = make_profiler_never_delete();
   c10::ThreadLocalDebugInfo::_push(c10::DebugInfoKind::PROFILER_STATE, g_prof);
 
+  AccelProfOptions_t options;
+  yosemite_init(options);
+
   // No destructor: do NOT pop or delete at exit.
+  atexit(cleanup);
 }

@@ -1,4 +1,7 @@
 PROJECT := torch_scope
+CONFIGS := Makefile.config
+
+include $(CONFIGS)
 
 LIB := lib$(PROJECT).so
 
@@ -21,6 +24,11 @@ PYTHON_VERSION = $(shell python3 -c 'import sys; print(f"{sys.version_info.major
 INCLUDES += -I$(PYTHON_INCLUDE_DIR)
 LDFLAGS += -L$(PYTHON_LIB_DIR)/../ -Wl,-rpath=$(PYTHON_LIB_DIR)/../
 LINK_LIBS += -lpython$(PYTHON_VERSION)
+
+
+INCLUDES  += -I$(SANALYZER_DIR)/include
+LDFLAGS   += -L$(SANALYZER_DIR)/lib -Wl,-rpath=$(SANALYZER_DIR)/lib
+LINK_LIBS += -lsanalyzer
 
 # --- Add CUDA (or HIP) component if present
 # Try torch_cuda first; if not found, try torch_hip (ROCm)
